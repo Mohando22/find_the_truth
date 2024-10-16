@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline de Traitement de Texte</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        async function processText() {
+            const textInput = document.getElementById("text_input").value;
+            const loading = document.getElementById("loading");
+            const output = document.getElementById("output");
+        
+            if (textInput.trim() !== "") { 
+                loading.style.display = "block";  // Show loading bar
+                output.innerHTML = "";  // Reset output area
+        
+                try {
+                    const response = await fetch("/process-text", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: new URLSearchParams({ text_input: textInput })
+                    });
+        
+                    const data = await response.json();
+                    loading.style.display = "none";  // Hide loading bar
+                    output.innerHTML = `<h2>Texte Traité :</h2><p>${data.processed_text}</p>`;  // Display processed text
+        
+                } catch (error) {
+                    loading.style.display = "none";  // Hide loading bar in case of error
+                    console.error("Erreur :", error);
+                    output.innerHTML = "<p>Erreur lors du traitement du texte.</p>";
+                }
+            }
+        }
+        
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Pipeline de traitement de texte</h1>
+        <form onsubmit="processText(); return false;">
+            <label for="text_input">Entrez votre texte :</label><br><br>
+            <textarea id="text_input" name="text_input" rows="4" cols="50"></textarea><br><br>
+            <input type="submit" value="Traiter le Texte">
+        </form>
+        
+        <!-- Barre de chargement -->
+        <div id="loading" class="loading" style="display: none;">
+            <p>Chargement en cours...</p>
+            <div class="loader"></div>
+        </div>
+
+        <!-- Zone d'affichage du texte traité et des logs -->
+        <div id="output" class="output">
+            <!-- Les résultats et logs seront affichés ici -->
+        </div>
+    </div>
+</body>
+</html>
